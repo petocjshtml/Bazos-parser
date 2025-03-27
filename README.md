@@ -7,4 +7,4 @@ Start command
 
 npm start
 
-https://simulator-stranky-bazos.vercel.app/
+
