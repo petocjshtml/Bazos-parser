@@ -1,67 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Product Parser</title>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-      <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
-   </head>
-   <body>
-      <!-- Modal pre výber formátu -->
-      <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
-            <div class="modal-content">
-               <div class="modal-header">
-                  <h5 class="modal-title" id="exportModalLabel">Vyberte formát exportu</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavrieť"></button>
-               </div>
-               <div class="modal-body">
-                  <button class="btn btn-primary w-100 mb-2" id="exportJSON">Exportovať do JSON</button>
-                  <button class="btn btn-secondary w-100 mb-2" id="exportTXT">Exportovať do TXT</button>
-                  <button class="btn btn-success w-100 mb-2" id="exportCSV">Exportovať do CSV</button>
-               </div>
-            </div>
-         </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Parser</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <!-- Modal pre výber formátu -->
+    <div
+      class="modal fade"
+      id="exportModal"
+      tabindex="-1"
+      aria-labelledby="exportModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exportModalLabel">
+              Vyberte formát exportu
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Zavrieť"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <button class="btn btn-primary w-100 mb-2" id="exportJSON">
+              Exportovať do JSON
+            </button>
+            <button class="btn btn-secondary w-100 mb-2" id="exportTXT">
+              Exportovať do TXT
+            </button>
+            <button class="btn btn-success w-100 mb-2" id="exportCSV">
+              Exportovať do CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="container mt-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item fs-1">
+          <a
+            href="/"
+            class="text-secondary text-decoration-none fs-1"
+            id="breadcrumb-home"
+            >Bazoš parser</a
+          >
+        </li>
+        <li class="breadcrumb-item fs-1">
+          <a
+            href="#"
+            class="text-secondary text-decoration-none fs-1"
+            id="subdomain"
+          ></a>
+        </li>
+        <li class="breadcrumb-item fs-1">
+          <a
+            href="#"
+            class="text-secondary text-decoration-none fs-1"
+            id="category"
+          ></a>
+        </li>
+      </ol>
+    </nav>
+    <div class="container mt-5">
+      <div class="d-flex justify-content-between mb-3">
+        <button id="startParsing" class="btn btn-success">
+          Začať parsovať
+        </button>
+        <button id="stopParsing" class="btn btn-danger" disabled>
+          Zastaviť
+        </button>
+        <button id="continueParsing" class="btn btn-primary" disabled>
+          Pokračovať
+        </button>
+        <button id="downloadTable" class="btn btn-dark" disabled>
+          Stiahnúť tabuľku
+        </button>
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <button
+            class="btn btn-primary"
+            type="button"
+            onclick="filterTable(); "
+          >
+            Inteligentné vyhľadávanie
+          </button>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          id="searchInput"
+          placeholder=""
+          aria-label=""
+          disabled
+          aria-describedby="basic-addon1"
+        />
       </div>
 
-      <nav class="container mt-3">
-         <ol class="breadcrumb">
-            <li class="breadcrumb-item fs-1"><a href="/" class="text-secondary text-decoration-none fs-1" id="breadcrumb-home">Bazoš parser</a></li>
-            <li class="breadcrumb-item fs-1"><a href="#" class="text-secondary text-decoration-none fs-1" id="subdomain"></a></li>
-            <li class="breadcrumb-item fs-1"><a href="#" class="text-secondary text-decoration-none fs-1" id="category"></a></li>
-         </ol>
-      </nav>
-      <div class="container mt-5">
-         <div class="d-flex justify-content-between mb-3">
-            <button id="startParsing" class="btn btn-success">Začať parsovať</button>
-            <button id="stopParsing" class="btn btn-danger" disabled>Zastaviť</button>
-            <button id="continueParsing" class="btn btn-primary" disabled>Pokračovať</button>
-            <button id="downloadTable" class="btn btn-dark" disabled>Stiahnúť tabuľku</button>
-         </div>
-
-         <div id="status" class="alert alert-info" role="alert">▲ Stav : parsovanie zatiaľ nespustené</div>
-         <div class="table-responsive mt-3">
-            <table class="table table-hover">
-               <thead class="table-dark">
-                  <tr>
-                     <th scope="col">#</th>
-                     <th scope="col">
-                        Produkt &#40; Aktuálne: <span id="totalParsed">0</span> &#41;
-                        <span id="copyTable" class="ms-5" style="cursor: pointer; color: #61a1fe">
-                           Kopírovať
-                           <img src="images/copy-icon.svg" alt="Copy symbol" style="width: 20px; height: 20px" />
-                        </span>
-                     </th>
-                  </tr>
-               </thead>
-               <tbody id="productTable"></tbody>
-            </table>
-         </div>
+      <div id="status" class="alert alert-info" role="alert">
+        ▲ Stav : parsovanie zatiaľ nespustené
       </div>
+      <div class="table-responsive mt-3">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">
+                Produkt &#40; Aktuálne: <span id="totalParsed">0</span> &#41;
+                <span
+                  id="copyTable"
+                  class="ms-5"
+                  style="cursor: pointer; color: #61a1fe"
+                >
+                  Kopírovať
+                  <img
+                    src="images/copy-icon.svg"
+                    alt="Copy symbol"
+                    style="width: 20px; height: 20px"
+                  />
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
+    </div>
 
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-      <script src="js/category.js"></script>
-   </body>
+    <script src="js/category.js"></script>
+  </body>
 </html>
